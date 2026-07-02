@@ -1,0 +1,6 @@
+name: xDrip
+variables:
+  - name: url
+    value: "{{ip}}:17580"
+  - name: ip
+    value: 10.140.85.59
