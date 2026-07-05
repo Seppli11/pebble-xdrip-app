@@ -85,3 +85,27 @@ test('fetchGlucose on empty array calls onError', () => {
   assert.equal(called, false, 'onSuccess should not be called');
   assert.ok(errorMessage.indexOf('empty') !== -1, 'error should mention empty, got: ' + errorMessage);
 });
+
+test('ready event on HTTP 500 sends error_code (GLUCOSE_HTTP=2) via sendAppMessage', () => {
+  const { pebble, xhr, consoleLogs } = loadIndex();
+  xhr.route('GET', 'sgv.json', () => ({ status: 500, body: 'boom' }));
+
+  pebble.fire('ready');
+
+  assert.equal(pebble.messages.length, 1, 'expected one sendAppMessage call');
+  assert.deepEqual(pebble.messages[0].message, { error_code: 2 });
+  assert.ok(
+    consoleLogs.some((l) => l.indexOf('500') !== -1),
+    'expected a log mentioning HTTP 500, got: ' + JSON.stringify(consoleLogs)
+  );
+});
+
+test('ready event on network error sends error_code (GLUCOSE_NETWORK=1) via sendAppMessage', () => {
+  const { pebble, xhr } = loadIndex();
+  // No route registered -> xhr.onerror fires.
+
+  pebble.fire('ready');
+
+  assert.equal(pebble.messages.length, 1, 'expected one sendAppMessage call');
+  assert.deepEqual(pebble.messages[0].message, { error_code: 1 });
+});

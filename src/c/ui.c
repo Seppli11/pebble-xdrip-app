@@ -3,6 +3,8 @@
 #include <pebble.h>
 
 #include "net.h"
+#include "error_modal.h"
+#include "errors.h"
 
 #define DIRECTION_GAP 6
 #define GLUCOSE_LAYER_Y 72
@@ -109,6 +111,20 @@ void ui_init() {
   window_stack_push(window, animated);
 
   net_set_data_update_handler(update_ui);
+
+  // Report any error from the net layer as a modal alert.
+  net_set_error_handler(error_modal_show);
+
+  // Check the phone connection at launch. If there's no connection, pkjs
+  // can't run, so show the no-phone modal. The net no-data timeout is not
+  // armed in this case (see net_init).
+  //
+  // NOTE: For future runtime BT drops while the app is open, hook a
+  // connection_service_subscribe() handler here to call
+  // error_modal_show(ERROR_NO_PHONE_CONNECTION) on disconnect.
+  if (!connection_service_peek_pebble_app_connection()) {
+    error_modal_show(ERROR_NO_PHONE_CONNECTION);
+  }
 }
 
 void ui_deinit() {

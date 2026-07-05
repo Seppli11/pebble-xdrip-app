@@ -1,5 +1,6 @@
 var HOST = "http://localhost:17580";
 var GlucoseModel = require('./glucose-model');
+var ErrorCodes = require('./error-codes');
 
 function fetchGlucose(onSuccess, onError) {
   var xhr = new XMLHttpRequest();
@@ -7,7 +8,7 @@ function fetchGlucose(onSuccess, onError) {
 
   xhr.onload = function () {
     if (xhr.status !== 200) {
-      onError('Failed to fetch glucose: HTTP ' + xhr.status);
+      onError('Failed to fetch glucose: HTTP ' + xhr.status, ErrorCodes.GLUCOSE_HTTP);
       return;
     }
 
@@ -15,12 +16,12 @@ function fetchGlucose(onSuccess, onError) {
     try {
       data = JSON.parse(xhr.responseText);
     } catch (e) {
-      onError('Failed to parse glucose response: ' + e.message);
+      onError('Failed to parse glucose response: ' + e.message, ErrorCodes.GLUCOSE_PARSE);
       return;
     }
 
     if (!data || !data.length) {
-      onError('Glucose response was empty');
+      onError('Glucose response was empty', ErrorCodes.GLUCOSE_EMPTY);
       return;
     }
 
@@ -28,10 +29,14 @@ function fetchGlucose(onSuccess, onError) {
   };
 
   xhr.onerror = function () {
-    onError('Network error while fetching glucose');
+    onError('Network error while fetching glucose', ErrorCodes.GLUCOSE_NETWORK);
   };
 
   xhr.send();
+}
+
+function sendError(code) {
+  Pebble.sendAppMessage({ 'error_code': code });
 }
 
 Pebble.addEventListener('ready', function () {
@@ -41,8 +46,11 @@ Pebble.addEventListener('ready', function () {
       console.log('Latest glucose: ' + model.latestMmol() + ' mmol/L');
       Pebble.sendAppMessage({ 'glucose': model.latestMmolX10(), 'direction': model.latestDirectionCode() });
     },
-    function (message) {
+    function (message, code) {
+      // Log the detailed message for debugging; send only the code to the
+      // watch so it can show a short user-facing error.
       console.log(message);
+      sendError(code);
     }
   );
 });

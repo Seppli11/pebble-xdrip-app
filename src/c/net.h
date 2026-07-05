@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "errors.h"
 
 typedef enum {
     NET_DIRECTION_FLAT = 0,
@@ -18,4 +19,13 @@ NetDirection net_get_direction();
 typedef void (*NetDataUpdateHandler)(void);
 void net_set_data_update_handler(NetDataUpdateHandler handler);
 
+typedef void (*NetErrorHandler)(ErrorCode error);
+void net_set_error_handler(NetErrorHandler handler);
+
 void net_init();
+// Cancel the no-data timeout timer (call when an error is handled locally
+// before the timer fires, or when the watch reports its own error and the
+// pkjs timeout no longer applies).
+void net_cancel_timeout(void);
+// Start (or restart) the no-data timeout timer.
+void net_start_timeout(void);
