@@ -34,3 +34,19 @@ set `pebble.watchapp.watchface` to `true` in `package.json`.
 ## Documentation
 
 Full SDK docs, tutorials, and API reference: <https://developer.repebble.com>
+
+## Testing the pkjs (phone-side JS)
+
+The PebbleKit JS source in `src/pkjs/` runs in a Pebble-specific runtime. A
+lightweight, dependency-free harness mocks `Pebble`, `XMLHttpRequest`, and
+`console` so `src/pkjs/index.js` can be loaded and exercised under Node.
+
+```sh
+npm run test:js          # runs tests/js/**/*.test.js
+```
+
+Add new tests alongside `tests/js/index.test.js`. The harness lives in
+`tests/js/harness/` — `load.js` installs the mocks and loads the source
+file as-is; `pebble-mock.js` and `xhr-mock.js` provide the fakes. The
+`XMLHttpRequest` mock can serve fixture data from `tests/js/fixtures/`
+(e.g. `sgv.json`) via `xhr.route(method, urlSubstring, handler)`.

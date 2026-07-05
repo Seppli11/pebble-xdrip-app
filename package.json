@@ -1,12 +1,15 @@
 {
   "name": "pebble-xdrip-app",
-  "author": "MakeAwesomeHappen",
+  "author": "Seppli11",
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
+  "scripts": {
+    "test:js": "node --test tests/js/**/*.test.js"
+  },
   "dependencies": {},
   "pebble": {
-    "displayName": "pebble-xdrip-app",
+    "displayName": "Glucose Monitor",
     "uuid": "d54c32c1-79a8-4f47-a25f-e2c869fb0dd3",
     "sdkVersion": "3",
     "enableMultiJS": true,
@@ -23,7 +26,8 @@
       "watchface": false
     },
     "messageKeys": [
-      "dummy"
+      "glucose",
+      "MESSAGE_KEY_JSReady"
     ],
     "resources": {
       "media": []
