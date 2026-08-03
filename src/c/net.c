@@ -59,6 +59,12 @@ int32_t net_get_glucose() {
     return glucose;
 }
 
+static int32_t reading_time = 0;
+
+int32_t net_get_reading_time() {
+    return reading_time;
+}
+
 static NetDirection direction = NET_DIRECTION_UNKNOWN;
 
 NetDirection net_get_direction() {
@@ -87,6 +93,12 @@ static void inbox_received_handler(DictionaryIterator *iter, void *context) {
   if(direction_code_tuple) {
     direction = (NetDirection)direction_code_tuple->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Received direction code: %d", direction);
+  }
+
+  Tuple *date_tuple = dict_find(iter, MESSAGE_KEY_sgv_date);
+  if(date_tuple) {
+    reading_time = date_tuple->value->int32;
+    APP_LOG(APP_LOG_LEVEL_INFO, "Received reading date: %d", reading_time);
   }
 
   // Success path: glucose (or at least direction) arrived, so the pkjs fetch

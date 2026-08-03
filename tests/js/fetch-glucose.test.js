@@ -86,7 +86,11 @@ test('fetchGlucose on empty array calls onError', () => {
   assert.ok(errorMessage.indexOf('empty') !== -1, 'error should mention empty, got: ' + errorMessage);
 });
 
-test('ready event on HTTP 500 sends error_code (GLUCOSE_HTTP=2) via sendAppMessage', () => {
+test('ready event on HTTP 500 sends error_code (GLUCOSE_HTTP=2) via sendAppMessage', (t) => {
+  // Mock timers so the auto-update loop armed by the ready handler can't keep
+  // the Node process alive after the test finishes.
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+
   const { pebble, xhr, consoleLogs } = loadIndex();
   xhr.route('GET', 'sgv.json', () => ({ status: 500, body: 'boom' }));
 
@@ -100,7 +104,9 @@ test('ready event on HTTP 500 sends error_code (GLUCOSE_HTTP=2) via sendAppMessa
   );
 });
 
-test('ready event on network error sends error_code (GLUCOSE_NETWORK=1) via sendAppMessage', () => {
+test('ready event on network error sends error_code (GLUCOSE_NETWORK=1) via sendAppMessage', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+
   const { pebble, xhr } = loadIndex();
   // No route registered -> xhr.onerror fires.
 

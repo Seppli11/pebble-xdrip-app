@@ -49,6 +49,14 @@ test('getMmolX10 returns mmol/L × 10 as an integer for the watch', () => {
 });
 
 
+test('latestDateSeconds returns the reading date in unix seconds', () => {
+  const model = new GlucoseModel(records);
+  // fixture first record date is 1783018997665 ms -> 1783018997 s
+  assert.equal(model.latestDateSeconds(), 1783018997);
+  assert.equal(model.getDateSeconds(1), 1783018877);
+});
+
+
 test('latestDirection returns last direction', () => {
   const model = new GlucoseModel(records);
   assert.equal(model.latestDirectionCode(), 1);

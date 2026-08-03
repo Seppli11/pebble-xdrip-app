@@ -46,13 +46,26 @@ function createXhrMock() {
         return;
       }
 
-      const { status = 200, body = '' } = route.handler(this._url) || {};
-      this.status = status;
-      this.responseText = body;
-      this.readyState = 4;
+      const { status = 200, body = '', delay, hang } = route.handler(this._url) || {};
+      if (hang) {
+        // Never respond. Used to test the pkjs fetch watchdog.
+        return;
+      }
 
-      if (typeof this.onload === 'function') {
-        this.onload();
+      const respond = () => {
+        this.status = status;
+        this.responseText = body;
+        this.readyState = 4;
+        if (typeof this.onload === 'function') {
+          this.onload();
+        }
+      };
+
+      if (delay) {
+        // Async response, driven by (possibly mocked) timers.
+        setTimeout(respond, delay);
+      } else {
+        respond();
       }
     }
   }

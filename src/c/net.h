@@ -15,6 +15,9 @@ typedef enum {
 
 int32_t net_get_glucose();
 NetDirection net_get_direction();
+// Unix seconds of the latest CGM reading (from the sgv record's `date` field),
+// 0 until the first reading arrives. Used to display reading time and age.
+int32_t net_get_reading_time();
 
 typedef void (*NetDataUpdateHandler)(void);
 void net_set_data_update_handler(NetDataUpdateHandler handler);

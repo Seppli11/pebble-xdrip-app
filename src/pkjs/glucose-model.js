@@ -34,6 +34,16 @@ GlucoseModel.prototype.latest = function () {
   return this.records[0];
 };
 
+// Reading timestamp as unix seconds (sgv records store `date` in ms), for
+// sending to the watch so it can display the reading time and age.
+GlucoseModel.prototype.getDateSeconds = function (index) {
+  return Math.floor(this.records[index].date / 1000);
+};
+
+GlucoseModel.prototype.latestDateSeconds = function () {
+  return this.getDateSeconds(0);
+};
+
 GlucoseModel.prototype.latestMgdl = function () {
   return this.getMgdl(0);
 };

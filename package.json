@@ -28,7 +28,8 @@
     "messageKeys": [
       "glucose",
       "direction",
-      "error_code"
+      "error_code",
+      "sgv_date"
     ],
     "resources": {
       "media": [
